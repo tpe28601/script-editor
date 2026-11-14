@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Script Editor core (no UI): 區塊庫、專案模型、驗證與 .bat 匯出器。
 
-資料模型（全部 JSON, 欄位說明見 README.txt）:
+資料模型（全部 JSON, 欄位說明見 README.md）:
     block   = 一個可重複使用的腳本區塊（一條指令 + 參數 + 可接受 rc）。
     project = 一個匯出腳本: 標題 + 設定 + Task 清單; Task = 主選單一項,
               內含依序執行的 step 清單, 每個 step 引用一個 block。
@@ -128,7 +128,7 @@ def load_block_files(dirs):
 
 
 def validate_block(b):
-    """回傳錯誤清單（空 = OK）。欄位規範見 README.txt。"""
+    """回傳錯誤清單（空 = OK）。欄位規範見 README.md。"""
     errs = []
     if not isinstance(b, dict):
         return ['必須是 JSON 物件']

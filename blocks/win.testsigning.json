@@ -1,0 +1,7 @@
+{
+ "id": "win.testsigning",
+ "name": "Enable Test Signing",
+ "category": "Windows",
+ "desc": "bcdedit 開啟測試簽章模式（重開機後生效）",
+ "cmd": "bcdedit /set testsigning on"
+}

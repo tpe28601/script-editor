@@ -1,0 +1,11 @@
+{
+ "id": "win.restore_menu",
+ "name": "Restore Default Context Menu",
+ "category": "Windows",
+ "desc": "移除傳統功能表設定（回復 Win11 預設）",
+ "cmd": "reg delete \"HKCU\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32\" /f",
+ "expectRc": [
+  0,
+  1
+ ]
+}

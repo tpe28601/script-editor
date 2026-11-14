@@ -1,0 +1,12 @@
+{
+ "id": "win.enable_admin",
+ "name": "Enable Built-in Administrator",
+ "category": "Windows",
+ "desc": "啟用內建 Administrator 帳號（同 reference [3]）",
+ "cmd": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$u=Get-LocalUser | Where-Object {$_.SID.Value -match '-500$'} | Select-Object -First 1; if($null -eq $u){Write-Host '[ERROR] Built-in Administrator account was not found.' -ForegroundColor Red;exit 2};Write-Host ('Account found: '+$u.Name);if($u.Enabled){Write-Host '[INFO] Administrator account is already enabled.' -ForegroundColor Cyan;exit 0};try{Enable-LocalUser -SID $u.SID -ErrorAction Stop;Write-Host '[SUCCESS] Administrator account has been enabled.' -ForegroundColor Green;exit 0}catch{Write-Host ('[ERROR] '+$_.Exception.Message) -ForegroundColor Red;exit 3}\"",
+ "display": "enable the built-in Administrator account",
+ "expectRc": [
+  0,
+  1
+ ]
+}

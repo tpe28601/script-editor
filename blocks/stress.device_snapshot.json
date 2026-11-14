@@ -1,0 +1,15 @@
+{
+ "id": "stress.device_snapshot",
+ "name": "Save Device Reference List",
+ "category": "Stress",
+ "desc": "存硬體裝置清單參考檔（腳本同目錄 se_devices.txt, 用 Get-PnpDevice）; 已存在則保留第一次的快照不覆蓋。放重開循環的第一個步驟。",
+ "raw": [
+  "if exist \"%~dp0se_devices.txt\" goto {LBL}_SKIP",
+  "powershell.exe -NoProfile -Command \"Get-PnpDevice -PresentOnly | Sort-Object InstanceId | ForEach-Object { $_.InstanceId + '=' + $_.Status } | Set-Content -LiteralPath '%~dp0se_devices.txt'\"",
+  "echo Reference device list saved: %~dp0se_devices.txt",
+  "goto {LBL}_END",
+  ":{LBL}_SKIP",
+  "echo %C_INFO%[INFO] Reference list exists - keeping the first snapshot.%C_END%",
+  ":{LBL}_END"
+ ]
+}

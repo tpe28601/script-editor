@@ -1,0 +1,12 @@
+{
+ "id": "stress.clear_loop",
+ "name": "Stop Stress Loop",
+ "category": "Stress",
+ "desc": "中止所有 stress 循環: 取消排定的重開機/關機（shutdown /a）、清計數檔、清 RunOnce 自動重跑註冊。要放棄測試時把它做成單獨一個任務。",
+ "raw": [
+  "shutdown /a >nul 2>&1",
+  "del /q \"%~dp0se_cycle_*.txt\" >nul 2>&1",
+  "for /f \"tokens=1\" %%V in ('reg query \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" 2^>nul ^| findstr /r /c:\"^[ ]*SE_\"') do reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v %%V /f >nul 2>&1",
+  "echo %C_INFO%[INFO] Stress counters and reboot RunOnce entries cleared.%C_END%"
+ ]
+}

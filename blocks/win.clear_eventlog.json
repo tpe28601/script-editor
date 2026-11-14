@@ -1,0 +1,10 @@
+{
+ "id": "win.clear_eventlog",
+ "name": "Clear Event Logs",
+ "category": "Windows",
+ "desc": "清空所有事件記錄檔（wevtutil el / cl, 仿 VKEStress ClearAllEvents; 使用中無法清取的記錄會略過）",
+ "raw": [
+  "for /f \"delims=\" %%L in ('wevtutil el') do wevtutil cl \"%%L\" >nul 2>nul",
+  "echo %C_INFO%[INFO] Event logs cleared (locked logs skipped).%C_END%"
+ ]
+}

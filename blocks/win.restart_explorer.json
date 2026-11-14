@@ -1,0 +1,11 @@
+{
+ "id": "win.restart_explorer",
+ "name": "Restart Explorer",
+ "category": "Windows",
+ "desc": "重啟 explorer.exe（套用 shell 註冊表變更）",
+ "raw": [
+  "taskkill /f /im explorer.exe >nul 2>&1",
+  "timeout /t 1 /nobreak >nul",
+  "start \"\" explorer.exe"
+ ]
+}

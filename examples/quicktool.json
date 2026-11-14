@@ -1,0 +1,128 @@
+{
+ "name": "QuickTool",
+ "title": "Windows Quick Tool",
+ "requireAdmin": true,
+ "runAll": false,
+ "bundleRoot": "auto",
+ "summary": true,
+ "statusSteps": [
+  { "block": "sys.win_status" }
+ ],
+ "tasks": [
+  {
+   "name": "Enable Test Signing",
+   "desc": "bcdedit testsigning on, then offer a restart",
+   "group": "Windows settings",
+   "restarts": false,
+   "steps": [
+    { "block": "win.testsigning", "askAfter": "Restart now?" },
+    { "block": "sys.restart" }
+   ]
+  },
+  {
+   "name": "Enable Classic Context Menu",
+   "desc": "Windows 11 classic right-click menu, then restart Explorer",
+   "group": "Windows settings",
+   "steps": [
+    { "block": "win.classic_menu" },
+    { "block": "win.restart_explorer" }
+   ]
+  },
+  {
+   "name": "Switch to Administrator Account",
+   "desc": "Enable the built-in Administrator, then offer to sign out",
+   "group": "Windows settings",
+   "steps": [
+    { "block": "win.enable_admin", "askAfter": "Sign out now?" },
+    { "block": "win.signout" }
+   ]
+  },
+  {
+   "name": "Service Reset",
+   "desc": "Sample tools: enter service mode, clear, then reset (restarts)",
+   "group": "Service settings",
+   "restarts": true,
+   "requireFiles": [
+    "C:\\SampleTools\\SampleMode64W.exe",
+    "C:\\SampleTools\\SampleReset64W.exe",
+    "C:\\SampleTools\\SampleCfg64W.exe"
+   ],
+   "steps": [
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" }, "ARGS": { "mode": "fixed", "value": "+SERVICE_A +SERVICE_B" } } },
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleReset64W.exe" }, "ARGS": { "mode": "fixed", "value": "clr" } } },
+    { "block": "gen.tool", "confirm": true, "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleCfg64W.exe" }, "ARGS": { "mode": "fixed", "value": "-set EC=Reset" } } }
+   ]
+  },
+  {
+   "name": "Open Debug Page",
+   "desc": "Sample tools: enable the debug page, then restart into BIOS",
+   "group": "Service settings",
+   "restarts": false,
+   "requireFiles": [
+    "C:\\SampleTools\\SampleMode64W.exe",
+    "C:\\SampleTools\\SampleCfg64W.exe"
+   ],
+   "steps": [
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" }, "ARGS": { "mode": "fixed", "value": "+DEBUG_PAGE" } } },
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleCfg64W.exe" }, "ARGS": { "mode": "fixed", "value": "0x0100:0x0001" } }, "askAfter": "Restart into BIOS now?" },
+    { "block": "sys.bios_restart" }
+   ]
+  },
+  {
+   "name": "Set Service Tag and Exit Service Mode",
+   "desc": "7 characters, letters and digits, no vowels; typed in upper case",
+   "group": "Service settings",
+   "requireFiles": [
+    "C:\\SampleTools\\SampleMode64W.exe",
+    "C:\\SampleTools\\SampleReset64W.exe",
+    "C:\\SampleTools\\SampleCfg64W.exe"
+   ],
+   "steps": [
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" }, "ARGS": { "mode": "fixed", "value": "+SERVICE_A +SERVICE_B" } } },
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleReset64W.exe" }, "ARGS": { "mode": "fixed", "value": "clr" } } },
+    { "block": "gen.tool_input", "params": {
+      "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleCfg64W.exe" },
+      "ARGS": { "mode": "fixed", "value": "-w Service_Tag:" },
+      "VALUE": { "mode": "ask", "prompt": "Enter Service Tag", "uppercase": true, "minLength": 7, "maxLength": 7, "validate": "^[B-DF-HJ-NP-TV-Z0-9]{7}$" } } },
+    { "block": "gen.tool", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" }, "ARGS": { "mode": "fixed", "value": "exit" } } }
+   ]
+  },
+  {
+   "name": "Enable / Disable Service Modes",
+   "desc": "Read the modes, then type changes such as +MODE_A -MODE_B",
+   "group": "Service settings",
+   "key": "M",
+   "requireFiles": [ "C:\\SampleTools\\SampleMode64W.exe" ],
+   "steps": [
+    { "block": "gen.tool", "onFail": "continue", "params": { "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" }, "ARGS": { "mode": "fixed", "value": "read" } } },
+    { "block": "gen.tool_input", "confirm": true, "params": {
+      "EXE": { "mode": "fixed", "value": "C:\\SampleTools\\SampleMode64W.exe" },
+      "VALUE": { "mode": "ask", "prompt": "Modes (+XX -YY)", "uppercase": true, "validate": "^[+-][A-Z0-9_]+( [+-][A-Z0-9_]+)*$" } } }
+   ]
+  },
+  {
+   "name": "Enter BIOS / UEFI Setup",
+   "desc": "Restart straight into firmware setup",
+   "group": "System",
+   "steps": [
+    { "block": "sys.bios_restart", "confirm": true }
+   ]
+  },
+  {
+   "name": "Restart Now",
+   "group": "System",
+   "steps": [
+    { "block": "sys.restart", "confirm": true }
+   ]
+  },
+  {
+   "name": "Show System Status",
+   "desc": "Read-only: Windows settings and storage mode",
+   "group": "System",
+   "steps": [
+    { "block": "sys.win_status" },
+    { "block": "sys.sata_mode", "onFail": "continue" }
+   ]
+  }
+ ]
+}

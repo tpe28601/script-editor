@@ -1,0 +1,21 @@
+{
+ "id": "gen.tool",
+ "name": "Run Tool",
+ "category": "General",
+ "desc": "執行指定路徑的程式（含參數），依 exit code 判定成功；路徑可放在任務的「必要檔案」先檢查",
+ "cmd": "\"${EXE}\" ${ARGS}",
+ "params": [
+  {
+   "name": "EXE",
+   "prompt": "Program path",
+   "mode": "fixed",
+   "default": ""
+  },
+  {
+   "name": "ARGS",
+   "prompt": "Arguments",
+   "mode": "fixed",
+   "default": ""
+  }
+ ]
+}

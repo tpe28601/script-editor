@@ -1,0 +1,7 @@
+{
+ "id": "win.testsigning_off",
+ "name": "Disable Test Signing",
+ "category": "Windows",
+ "desc": "bcdedit 關閉測試簽章模式",
+ "cmd": "bcdedit /set testsigning off"
+}

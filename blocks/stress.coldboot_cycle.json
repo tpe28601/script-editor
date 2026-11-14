@@ -1,0 +1,41 @@
+{
+ "id": "stress.coldboot_cycle",
+ "name": "ColdBoot Stress Cycle",
+ "category": "Stress",
+ "desc": "關機循環（仿 VKEStress coldboot）: 同 warmboot 但排定 shutdown /s; 需 BIOS 設來電自動開機（AC power on）或操作員按電源, 開機登入後 RunOnce 自動續跑。達目標次數自動清理。",
+ "raw": [
+  "set \"SE_CYCF=%~dp0se_cycle_{LBL}.txt\"",
+  "set \"SE_CYC=0\"",
+  "if exist \"%SE_CYCF%\" set /p SE_CYC=<\"%SE_CYCF%\"",
+  "set /a SE_CYC+=1",
+  "echo Coldboot stress cycle %SE_CYC% of ${CYCLES} at %date% %time%",
+  ">>\"%SE_LOG%\" echo Coldboot cycle %SE_CYC% of ${CYCLES}  %date% %time%",
+  "if %SE_CYC% GEQ ${CYCLES} goto {LBL}_DONE",
+  ">\"%SE_CYCF%\" echo %SE_CYC%",
+  "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v SE_{LBL} /t REG_SZ /d \"\\\"%~f0\\\" /run {RUN}\" /f >nul",
+  "shutdown /s /t ${DELAY} /c \"Coldboot stress cycle %SE_CYC% of ${CYCLES}\"",
+  "echo %C_INFO%[INFO] Shutdown scheduled in ${DELAY}s - power the machine back on to continue.%C_END%",
+  "echo %C_INFO%[INFO] Abort: run 'shutdown /a' now, then use the 'Stop stress loop' task.%C_END%",
+  "goto EXIT",
+  ":{LBL}_DONE",
+  "del \"%SE_CYCF%\" >nul 2>&1",
+  "reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v SE_{LBL} /f >nul 2>&1",
+  "echo %C_OK%[SUCCESS] Coldboot stress finished: ${CYCLES} cycles.%C_END%"
+ ],
+ "params": [
+  {
+   "name": "CYCLES",
+   "prompt": "Total cycles",
+   "mode": "ask",
+   "default": "200",
+   "validate": "^[1-9][0-9]{0,4}$"
+  },
+  {
+   "name": "DELAY",
+   "prompt": "Shutdown delay seconds",
+   "mode": "ask",
+   "default": "10",
+   "validate": "^[0-9]{1,3}$"
+  }
+ ]
+}

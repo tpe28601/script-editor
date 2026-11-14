@@ -1,0 +1,27 @@
+{
+ "id": "gen.tool_input",
+ "name": "Run Tool With Typed Value",
+ "category": "General",
+ "desc": "執行程式，參數後面接上操作員輸入的值（例如 Service_Tag: + 輸入的 7 碼）；輸入可設轉大寫、長度、regex",
+ "cmd": "\"${EXE}\" ${ARGS}${VALUE}",
+ "params": [
+  {
+   "name": "EXE",
+   "prompt": "Program path",
+   "mode": "fixed",
+   "default": ""
+  },
+  {
+   "name": "ARGS",
+   "prompt": "Arguments before the value",
+   "mode": "fixed",
+   "default": ""
+  },
+  {
+   "name": "VALUE",
+   "prompt": "Value",
+   "mode": "ask",
+   "default": ""
+  }
+ ]
+}

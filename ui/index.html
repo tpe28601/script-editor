@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f3f5f9">
+<link rel="icon" href="data:,">
+<title>Script Editor</title>
+<link rel="stylesheet" href="/ui-kit.css">
+<link rel="stylesheet" href="/app.css">
+<!-- 深淺色／強調色：網址 ?theme=&accent=（Hub 嵌入時帶入）> 本機記憶 > 跟隨系統 -->
+<script src="/tb-theme.js"></script>
+</head>
+<body class="tb-app">
+<header class="tb-topbar">
+  <span class="tb-brand__logo"><svg class="tb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m8 10 2 2-2 2"/><path d="M12 14h4"/></svg></span>
+  <span class="tb-topbar__title">Script Editor</span>
+  <span class="tb-topbar__version" id="ver">…</span>
+  <span class="tb-topbar__spacer"></span>
+  <span class="tb-badge" id="state-badge">新專案</span>
+  <button class="tb-btn tb-btn--sm tb-btn--ghost" id="theme-toggle" type="button" title="切換主題：淺色 → 深色 → 跟隨系統">
+    <svg class="tb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+  </button>
+</header>
+
+<main class="se-main">
+  <!-- ============ 工具列 ============ -->
+  <section class="tb-card">
+    <div class="tb-input-row se-proj-row">
+      <label class="tb-small tb-muted" for="proj-name">專案</label>
+      <input class="tb-input tb-input--mono" id="proj-name" type="text" style="max-width:260px"
+             placeholder="專案名稱（ASCII, 匯出檔名由來）" spellcheck="false">
+      <button class="tb-btn" id="btn-new" type="button">新專案</button>
+      <button class="tb-btn" id="btn-open" type="button">開啟…</button>
+      <button class="tb-btn" id="btn-sample" type="button">載入範例</button>
+      <button class="tb-btn" id="btn-pack-export" type="button" title="把自訂區塊與專案打包成 .sepack.json, 分享給同事">匯出區塊包…</button>
+      <button class="tb-btn" id="btn-pack-import" type="button" title="匯入同事給的 .sepack.json（先預覽）">匯入區塊包…</button>
+      <span class="tb-spacer"></span>
+      <button class="tb-btn" id="btn-validate" type="button">驗證</button>
+      <button class="tb-btn" id="btn-save" type="button">儲存</button>
+      <button class="tb-btn" id="btn-export-gui" type="button">匯出 GUI .bat</button>
+      <button class="tb-btn tb-btn--primary" id="btn-export" type="button">匯出 .bat</button>
+    </div>
+  </section>
+
+  <div class="se-cols">
+    <!-- ============ 區塊庫 ============ -->
+    <aside class="tb-card se-lib">
+      <div class="tb-card__head">
+        <h2 class="tb-card__title">區塊庫</h2>
+        <span class="tb-card__label">拖到任務, 或點一下加入選取中的任務；自訂區塊可雙擊編輯</span>
+      </div>
+      <div class="tb-input-row">
+        <input class="tb-input" id="lib-search" type="search" placeholder="搜尋區塊…">
+        <button class="tb-btn tb-btn--sm" id="btn-add-block" type="button" title="新增自訂區塊">＋自訂</button>
+      </div>
+      <div class="se-liblist" id="lib-list"></div>
+    </aside>
+
+    <!-- ============ 任務（Task）清單 ============ -->
+    <section class="tb-card se-mid">
+      <div class="tb-card__head">
+        <h2 class="tb-card__title">任務（匯出腳本的主選單）</h2>
+        <button class="tb-btn tb-btn--sm" id="btn-add-task" type="button">＋新增任務</button>
+      </div>
+      <div id="task-list" class="se-tasklist"></div>
+    </section>
+
+    <!-- ============ 內容面板 ============ -->
+    <aside class="tb-card se-insp">
+      <div class="tb-card__head"><h2 class="tb-card__title" id="insp-title">專案設定</h2></div>
+      <div id="insp-body" class="se-insp-body"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- ============ 開啟專案 / 內建範例 彈窗（共用, 標題由 JS 設） ============ -->
+<div class="se-mask hidden" id="open-mask">
+  <div class="se-modal" style="width:520px">
+    <div class="se-modal__head">
+      <span id="open-title">開啟專案</span>
+      <button class="tb-btn tb-btn--sm tb-btn--ghost" id="open-close" type="button">✕</button>
+    </div>
+    <div class="se-modal__body"><div id="open-list" class="tb-table-wrap"></div></div>
+  </div>
+</div>
+
+<!-- ============ 自訂區塊編輯彈窗 ============ -->
+<div class="se-mask hidden" id="blk-mask">
+  <div class="se-modal" style="width:720px">
+    <div class="se-modal__head">
+      <span id="blk-title">新增自訂區塊</span>
+      <button class="tb-btn tb-btn--sm tb-btn--ghost" id="blk-close" type="button">✕</button>
+    </div>
+    <div class="se-modal__body">
+      <div class="se-fgrid">
+        <label>id（小寫英數字）<input class="tb-input tb-input--mono" id="blk-id" spellcheck="false"></label>
+        <label>名稱（ASCII, 會進匯出腳本）<input class="tb-input" id="blk-name"></label>
+        <label>分類<input class="tb-input" id="blk-cat" value="自訂"></label>
+        <label class="se-fspan">說明（可中文, UI 顯示用）<input class="tb-input" id="blk-desc"></label>
+      </div>
+      <label class="se-flabel">指令（單行；可用 {TOOLS} {BUNDLE} 與 ${參數名}）
+        <textarea class="tb-input se-ta" id="blk-cmd" rows="2" spellcheck="false"></textarea></label>
+      <label class="se-flabel">執行時顯示的短指令（選填；空白 = 由指令自動產生，例如 Tool64W.exe ${ARGS}）
+        <input class="tb-input tb-input--mono" id="blk-display" spellcheck="false" maxlength="120"></label>
+      <label class="se-flabel">或 raw 批次行（每行一條；進階, 與指令二擇一；可用 {LBL} {TASK}）
+        <textarea class="tb-input se-ta" id="blk-raw" rows="4" spellcheck="false"></textarea></label>
+      <div class="se-fgrid">
+        <label>可接受 rc（逗號分隔）<input class="tb-input tb-input--mono" id="blk-rc" value="0"></label>
+        <label class="tb-check" style="align-self:end"><input type="checkbox" id="blk-bundle"> 需要工具包（{TOOLS}）</label>
+        <label class="tb-check" style="align-self:end"><input type="checkbox" id="blk-restarts"> 會重開機（GUI 按鈕標 Restarts）</label>
+      </div>
+      <div class="se-subhead">參數</div>
+      <div id="blk-params"></div>
+      <button class="tb-btn tb-btn--sm" id="blk-add-param" type="button">＋參數</button>
+    </div>
+    <div class="se-modal__foot">
+      <span class="tb-small tb-danger hidden" id="blk-err" style="margin-right:auto"></span>
+      <button class="tb-btn tb-btn--primary" id="blk-save" type="button">儲存區塊</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 區塊包 匯出 / 匯入 彈窗（共用, 內容由 JS 產生） ============ -->
+<div class="se-mask hidden" id="pack-mask">
+  <div class="se-modal" style="width:760px">
+    <div class="se-modal__head">
+      <span id="pack-title">區塊包</span>
+      <button class="tb-btn tb-btn--sm tb-btn--ghost" id="pack-close" type="button">✕</button>
+    </div>
+    <div class="se-modal__body" id="pack-body"></div>
+    <div class="se-modal__foot">
+      <span class="tb-small tb-danger hidden" id="pack-err" style="margin-right:auto"></span>
+      <button class="tb-btn tb-btn--primary" id="pack-go" type="button">確定</button>
+    </div>
+  </div>
+</div>
+<input type="file" id="pack-file" accept=".json,.sepack.json" class="hidden">
+
+<div class="se-toast hidden" id="toast" role="status"></div>
+
+<script src="/tb-icons.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+ "id": "gen.sleep",
+ "name": "Wait",
+ "category": "General",
+ "desc": "等待 N 秒（Start-Sleep, 不吃 console 輸入）",
+ "cmd": "powershell.exe -NoProfile -Command \"Start-Sleep -Seconds ${SEC}\"",
+ "display": "wait ${SEC} seconds",
+ "params": [
+  {
+   "name": "SEC",
+   "prompt": "Seconds",
+   "mode": "ask",
+   "default": "5",
+   "validate": "^[1-9][0-9]{0,4}$"
+  }
+ ]
+}

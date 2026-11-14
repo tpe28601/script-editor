@@ -1,0 +1,41 @@
+{
+ "id": "stress.warmboot_cycle",
+ "name": "WarmBoot Stress Cycle",
+ "category": "Stress",
+ "desc": "重開機應力循環（仿 VKEStress warmboot）: 每輪登入跑一次; 計數存在腳本同目錄 se_cycle_*.txt; 未達目標次數就寫 RunOnce 讓下次登入自動重跑本腳本 (/run N) 並排定 shutdown /r; 達目標自動清計數與 RunOnce。本輪到此結束整個腳本（迴圈等待下次開機）。",
+ "raw": [
+  "set \"SE_CYCF=%~dp0se_cycle_{LBL}.txt\"",
+  "set \"SE_CYC=0\"",
+  "if exist \"%SE_CYCF%\" set /p SE_CYC=<\"%SE_CYCF%\"",
+  "set /a SE_CYC+=1",
+  "echo Warmboot stress cycle %SE_CYC% of ${CYCLES} at %date% %time%",
+  ">>\"%SE_LOG%\" echo Warmboot cycle %SE_CYC% of ${CYCLES}  %date% %time%",
+  "if %SE_CYC% GEQ ${CYCLES} goto {LBL}_DONE",
+  ">\"%SE_CYCF%\" echo %SE_CYC%",
+  "reg add \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v SE_{LBL} /t REG_SZ /d \"\\\"%~f0\\\" /run {RUN}\" /f >nul",
+  "shutdown /r /t ${DELAY} /c \"Warmboot stress cycle %SE_CYC% of ${CYCLES}\"",
+  "echo %C_INFO%[INFO] Reboot scheduled in ${DELAY}s - the loop continues after next logon.%C_END%",
+  "echo %C_INFO%[INFO] Abort: run 'shutdown /a' now, then use the 'Stop stress loop' task.%C_END%",
+  "goto EXIT",
+  ":{LBL}_DONE",
+  "del \"%SE_CYCF%\" >nul 2>&1",
+  "reg delete \"HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\RunOnce\" /v SE_{LBL} /f >nul 2>&1",
+  "echo %C_OK%[SUCCESS] Warmboot stress finished: ${CYCLES} cycles.%C_END%"
+ ],
+ "params": [
+  {
+   "name": "CYCLES",
+   "prompt": "Total cycles",
+   "mode": "ask",
+   "default": "100",
+   "validate": "^[1-9][0-9]{0,4}$"
+  },
+  {
+   "name": "DELAY",
+   "prompt": "Reboot delay seconds",
+   "mode": "ask",
+   "default": "10",
+   "validate": "^[0-9]{1,3}$"
+  }
+ ]
+}

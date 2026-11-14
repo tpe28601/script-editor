@@ -1,0 +1,21 @@
+{
+ "id": "sys.bios_restart",
+ "name": "Restart into BIOS / UEFI",
+ "category": "System",
+ "restarts": true,
+ "desc": "重新開機進 BIOS（失敗自動重試一次, 同 reference [7]）",
+ "raw": [
+  "shutdown /r /fw /t 0",
+  "set \"SE_BIOS_RC=%errorlevel%\"",
+  "if \"%SE_BIOS_RC%\"==\"0\" goto {LBL}_OK",
+  "echo %C_INFO%[INFO] First attempt failed (exit code %SE_BIOS_RC%). Retrying in 3 seconds...%C_END%",
+  "ping -n 4 -w 1000 127.0.0.1 >nul",
+  "shutdown /r /fw /t 0",
+  "set \"SE_BIOS_RC=%errorlevel%\"",
+  "if \"%SE_BIOS_RC%\"==\"0\" goto {LBL}_OK",
+  "echo %C_ERR%[ERROR] Unable to enter BIOS / UEFI. Exit code: %SE_BIOS_RC%%C_END%",
+  "set \"SE_TASK_RC=1\"",
+  "goto {TASK}_END",
+  ":{LBL}_OK"
+ ]
+}

@@ -1,0 +1,8 @@
+{
+ "id": "sys.win_status",
+ "name": "Show Windows Status",
+ "category": "System",
+ "desc": "唯讀顯示 BIOS 版本/Service Tag/Test Signing/Secure Boot 等",
+ "cmd": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$b=Get-CimInstance Win32_BIOS;Write-Host ('  BIOS version         : '+$b.SMBIOSBIOSVersion);Write-Host ('  Service Tag (SMBIOS) : '+$b.SerialNumber);$o=bcdedit /enum '{current}' 2>$null;if($LASTEXITCODE -ne 0){$ts='Unknown'}else{$l=$o | Where-Object {$_ -match '^testsigning\\s'} | Select-Object -First 1;if($null -eq $l){$ts='OFF (not set)'}else{$ts=$l.Trim()}};Write-Host ('  Test Signing         : '+$ts);try{if(Confirm-SecureBootUEFI -ErrorAction Stop){$sb='ON'}else{$sb='OFF'}}catch [System.PlatformNotSupportedException]{$sb='Not supported'}catch{$sb='Unknown'};Write-Host ('  Secure Boot          : '+$sb);if(Test-Path -LiteralPath 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'){$cm='ON'}else{$cm='OFF'};Write-Host ('  Classic context menu : '+$cm);$u=Get-LocalUser | Where-Object {$_.SID.Value -match '-500$'} | Select-Object -First 1;if($null -eq $u){$ad='Not found'}elseif($u.Enabled){$ad='Enabled'}else{$ad='Disabled'};Write-Host ('  Built-in Admin       : '+$ad)\"",
+ "display": "read BIOS / Service Tag / Test Signing / Secure Boot / Admin status"
+}

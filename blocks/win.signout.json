@@ -1,0 +1,7 @@
+{
+ "id": "win.signout",
+ "name": "Sign Out Current User",
+ "category": "Windows",
+ "desc": "登出目前使用者",
+ "cmd": "shutdown /l"
+}

@@ -1,0 +1,8 @@
+{
+ "id": "sys.sata_mode",
+ "name": "Show SATA Operation (Windows view)",
+ "category": "System",
+ "desc": "由 PCI class 判斷目前 Windows 看到的 SATA/RAID 模式",
+ "cmd": "powershell.exe -NoProfile -ExecutionPolicy Bypass -Command \"$raid=$false;$ahci=$false;try{@(Get-CimInstance Win32_PnPEntity -Filter 'PNPDeviceID LIKE ''PCI\\\\%%''' -ErrorAction Stop | Where-Object {@($_.CompatibleID) -match '^PCI\\\\CC_010[468]$'}) | ForEach-Object {$cc=@(@($_.CompatibleID) -match '^PCI\\\\CC_010[468]$')[0] -replace '^PCI\\\\CC_','';if($cc -eq '0104'){$raid=$true}else{$ahci=$true};Write-Host ('  '+$_.Name+'  (PCI class '+$cc+')')}}catch{Write-Host ('  [ERROR] '+$_.Exception.Message)};if($raid){Write-Host 'SATA Operation in Windows: RAID'}elseif($ahci){Write-Host 'SATA Operation in Windows: AHCI (or NVMe direct)'}else{Write-Host 'SATA Operation in Windows: unknown'}\"",
+ "display": "read storage controller class (RAID / AHCI)"
+}

@@ -1,0 +1,15 @@
+{
+ "id": "gen.command",
+ "name": "Run Any Command",
+ "category": "General",
+ "desc": "執行任意指令（搭配 step 的重複/持續迴圈即成 stress）",
+ "cmd": "${CMD}",
+ "params": [
+  {
+   "name": "CMD",
+   "prompt": "Command",
+   "mode": "ask",
+   "default": ""
+  }
+ ]
+}

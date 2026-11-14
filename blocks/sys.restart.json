@@ -1,0 +1,8 @@
+{
+ "id": "sys.restart",
+ "name": "Restart Now",
+ "category": "System",
+ "restarts": true,
+ "desc": "立即重新開機",
+ "cmd": "shutdown /r /t 0"
+}

@@ -1,0 +1,9 @@
+{
+ "id": "stress.device_compare",
+ "name": "Check Device List Unchanged",
+ "category": "Stress",
+ "desc": "比對目前裝置清單與參考檔（仿 VKEStress DeviceCheck）; 有差異（裝置消失/狀態改變）會列出差異並失敗, 停止循環。要重建基準: 刪除 se_devices.txt。",
+ "cmd": "powershell.exe -NoProfile -Command \"$f='%~dp0se_devices.txt'; if(-not (Test-Path -LiteralPath $f)){Write-Host '[ERROR] No reference list - run Save Device Reference List first.' -ForegroundColor Red; exit 3}; $a=Get-Content -LiteralPath $f; $b=@(Get-PnpDevice -PresentOnly | Sort-Object InstanceId | ForEach-Object { $_.InstanceId + '=' + $_.Status }); $d=@(Compare-Object $a $b); if($d.Count -gt 0){Write-Host '[FAILED] Device list changed:' -ForegroundColor Red; $d | Format-Table -AutoSize | Out-String | Write-Host; exit 1}; Write-Host '[SUCCESS] Device list unchanged.' -ForegroundColor Green; exit 0\"",
+ "display": "compare the device list with the saved reference",
+ "expectRc": [0]
+}

@@ -1,0 +1,71 @@
+{
+ "name": "RebootStress",
+ "title": "Reboot Stress Tool",
+ "requireAdmin": true,
+ "runAll": false,
+ "bundleRoot": "auto",
+ "tasks": [
+  {
+   "name": "WarmBoot Stress",
+   "desc": "Reboot loop with device list check (VKEStress style)",
+   "steps": [
+    {
+     "block": "stress.device_snapshot"
+    },
+    {
+     "block": "stress.device_compare"
+    },
+    {
+     "block": "stress.warmboot_cycle",
+     "params": {
+      "CYCLES": {
+       "mode": "fixed",
+       "value": "100"
+      },
+      "DELAY": {
+       "mode": "fixed",
+       "value": "10"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "ColdBoot Stress",
+   "desc": "Power-off loop (needs auto-power-on or press power)",
+   "steps": [
+    {
+     "block": "stress.device_snapshot"
+    },
+    {
+     "block": "stress.device_compare"
+    },
+    {
+     "block": "stress.coldboot_cycle",
+     "params": {
+      "CYCLES": {
+       "mode": "fixed",
+       "value": "200"
+      },
+      "DELAY": {
+       "mode": "fixed",
+       "value": "10"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Stop stress loop",
+   "desc": "Abort shutdown and clear counters / RunOnce",
+   "steps": [
+    {
+     "block": "stress.clear_loop"
+    },
+    {
+     "block": "win.clear_eventlog"
+    }
+   ]
+  }
+ ]
+}

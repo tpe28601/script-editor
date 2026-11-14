@@ -1,0 +1,15 @@
+{
+ "id": "gen.echo",
+ "name": "Print Message",
+ "category": "General",
+ "desc": "輸出訊息到畫面與 log",
+ "cmd": "echo ${TEXT}",
+ "params": [
+  {
+   "name": "TEXT",
+   "prompt": "Message",
+   "mode": "ask",
+   "default": ""
+  }
+ ]
+}

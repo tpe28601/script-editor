@@ -1,0 +1,14 @@
+{
+  "specVersion": 1,
+  "kind": "tool",
+  "id": "script-editor",
+  "name": "Script Editor",
+  "version": "0.2.0",
+  "description": "視覺化組合腳本區塊：拖曳 Task/Step 內建 Windows／壓力測試區塊庫，匯出免依賴的選單式 .bat 或 WinForms 視窗版 .bat",
+  "runtime": { "kind": "powershell", "min": "5.1" },
+  "web": { "entry": "Script-Web.ps1", "defaultPort": 8785, "health": "/api/health" },
+  "cli": { "entry": "Launch-SE.ps1", "menu": false, "json": false },
+  "requires": ["python"],
+  "dataDir": "%LOCALAPPDATA%/DevToolbox/script-editor",
+  "uiKit": "3.2.0"
+}

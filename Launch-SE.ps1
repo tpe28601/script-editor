@@ -5,7 +5,7 @@
 param([int]$Port = 0)
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$argv = @('-OpenBrowser')
-if ($Port -gt 0) { $argv += @('-Port', $Port) }
+$argv = @{ OpenBrowser = $true }
+if ($Port -gt 0) { $argv.Port = $Port }
 & (Join-Path $here 'Script-Web.ps1') @argv
 exit $LASTEXITCODE

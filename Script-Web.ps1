@@ -1,4 +1,4 @@
-# Script-Web.ps1 - Dev-Toolbox web entry: start the Script Editor web server
+﻿# Script-Web.ps1 - Dev-Toolbox web entry: start the Script Editor web server
 # (se_web.py).  Tool runtime.kind stays 'powershell' (CLI = Launch-SE.ps1), so
 # the Hub launches this wrapper instead of resolving Python itself.
 # Usage: .\Script-Web.ps1 [-Port 8785] [-ParentPid <pid>] [-HubOrigin http://127.0.0.1:<p>] [-DataDir <path>]
@@ -11,9 +11,14 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
+if ($ParentPid -eq 0) {
+    $active = & (Join-Path $here 'Standalone-Update.ps1') -Action Resolve
+    if ($active) { & (Join-Path $active 'Script-Web.ps1') @PSBoundParameters; exit $LASTEXITCODE }
+}
 
 function Find-Python {
-    # same order as Hub Resolve-PythonExe: env > .venv > py > PATH python (skip WindowsApps)
+    $bundled = Join-Path $here 'runtime\python\python.exe'
+    if (Test-Path -LiteralPath $bundled -PathType Leaf) { return $bundled }
     if ($env:DEVTOOLBOX_PYTHON -and (Test-Path -LiteralPath $env:DEVTOOLBOX_PYTHON -PathType Leaf)) {
         return $env:DEVTOOLBOX_PYTHON
     }

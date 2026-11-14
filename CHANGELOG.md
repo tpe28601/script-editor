@@ -1,5 +1,10 @@
 # Changelog - Script-Editor
 
+## v0.2.1
+
+- 發行 ZIP 內附 Python，解壓後可用 Run-Script-Editor.bat 開啟。
+- 獨立啟動時自動檢查更新，有新版才顯示下載按鈕。也可透過 Dev-Toolbox Hub 安裝及更新。
+
 ## v0.2.0 (2026-11-14)
 
 ### 新增（區塊包）

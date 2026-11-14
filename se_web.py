@@ -38,14 +38,16 @@ import threading
 import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import se_core                                        # noqa: E402
 import se_pack                                        # noqa: E402
+from standalone_update import handle_update           # noqa: E402
 
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 TOOL_ID = 'script-editor'
 DEFAULT_PORT = 8785
 MAX_PORT_SCAN = 20
@@ -54,7 +56,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 UI_DIR = os.path.join(HERE, 'ui')
 UI_FILES = {'/': 'index.html', '/index.html': 'index.html', '/app.js': 'app.js',
             '/app.css': 'app.css', '/ui-kit.css': 'ui-kit.css',
-            '/tb-theme.js': 'tb-theme.js', '/tb-icons.js': 'tb-icons.js'}
+            '/tb-theme.js': 'tb-theme.js', '/tb-icons.js': 'tb-icons.js',
+            '/tb-standalone-update.js': 'tb-standalone-update.js'}
 CSP_PAGE = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data:; connect-src 'self'; ")
 STARTED_AT = time.time()
@@ -212,6 +215,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._send_err('BAD_JSON', 'JSON 解析失敗', 400)
         body = body if isinstance(body, dict) else {}
         path = urlparse(self.path).path
+        if path == '/api/standalone-update':
+            if self.server.hub_managed:
+                return self._send_err('HUB_MANAGED', '請從 Hub 更新此工具。', 403)
+            return self._send_json(handle_update(Path(HERE), body))
         if path == '/api/blocks/save':
             return self._api_block_save(body)
         if path == '/api/blocks/delete':
@@ -521,6 +528,7 @@ def main(argv=None):
         return 5
 
     Handler.port = httpd.server_address[1]
+    httpd.hub_managed = args.parent_pid > 0
     HTTPD = httpd
     if args.hub_origin:
         m = re.match(r'^http://(127\.0\.0\.1|localhost):(\d{1,5})$', args.hub_origin.strip().lower())

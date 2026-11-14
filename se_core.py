@@ -15,7 +15,7 @@ import json
 import os
 import re
 
-CORE_VERSION = '0.2.1'
+CORE_VERSION = '0.2.2'
 
 # ---------------------------------------------------------------- 文字規則
 BLOCK_ID_RE = re.compile(r'^[a-z0-9][a-z0-9._-]{1,47}$')

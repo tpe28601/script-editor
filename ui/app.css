@@ -1,6 +1,26 @@
 /* Script Editor 專用樣式（沿用 ui-kit 變數；只補三欄編輯器需要的 se-* 類） */
 
 /* ---------- 版面：工具列 + 三欄 ---------- */
+.tool-topbar, .se-project-actions {
+  padding-inline: 18px;
+  background: var(--tb-surface);
+  border-bottom: 1px solid var(--tb-border);
+}
+.tool-topbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-block: 10px;
+}
+.tool-topbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--tb-fs-lg);
+  font-weight: 650;
+}
+.tool-topbar__controls { margin-inline-start: auto; }
 .se-main {
   display: flex;
   flex-direction: column;
@@ -8,8 +28,33 @@
   padding: var(--tb-space-3);
   min-height: 0;
 }
-.se-proj-row { align-items: center; flex-wrap: wrap; }
-.se-proj-row .tb-input { flex: 1 1 180px; min-width: 0; }
+.se-project-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tb-space-2) var(--tb-space-3);
+}
+.se-project-field label { font-weight: 600; }
+.se-project-field .tb-input { flex: 1 1 180px; min-width: 0; max-width: 320px; }
+.se-project-field .tb-badge {
+  margin-inline-start: auto;
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.se-project-actions, .se-project-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.se-project-actions {
+  gap: var(--tb-space-2) var(--tb-space-4);
+  padding-block: 8px;
+}
+.se-project-group { gap: var(--tb-space-2); min-width: 0; }
+@media (max-width: 560px) {
+  .tool-topbar, .se-project-actions { padding-inline: 10px; }
+}
 .se-main { min-width: 0; }
 /* 區塊庫一律在左、任務在右（拖曳時兩邊同時看得到）:
      >= 1280px  區塊庫 | 任務 | 設定面板
@@ -336,6 +381,33 @@
   font-weight: 600;
 }
 .se-modal__body { padding: 14px; overflow-y: auto; }
+.se-project-picker { width: 560px; }
+.se-picker-content { display: grid; gap: var(--tb-space-4); }
+.se-picker-section > h3 { font-size: var(--tb-fs); margin-bottom: var(--tb-space-2); }
+.se-picker-section > p { margin: 0 0 var(--tb-space-2); }
+.se-picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--tb-border-strong);
+  border-radius: var(--tb-radius-lg);
+  background: var(--tb-surface);
+}
+.se-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tb-space-2) var(--tb-space-3);
+  padding: var(--tb-space-3);
+}
+.se-picker-row + .se-picker-row { border-top: 1px solid var(--tb-border); }
+.se-picker-row__info {
+  flex: 1 1 145px;
+  min-width: 0;
+  display: grid;
+  overflow-wrap: anywhere;
+}
+.se-picker-row__actions { display: flex; flex-wrap: wrap; gap: var(--tb-space-2); margin-inline-start: auto; }
 .se-modal__foot {
   display: flex;
   align-items: center;
@@ -343,27 +415,6 @@
   padding: 10px 14px;
   border-top: 1px solid var(--tb-border);
 }
-
-/* ---------- toast ---------- */
-.se-toast {
-  position: fixed;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
-  background: var(--tb-surface);
-  border: 1px solid var(--tb-border-strong);
-  border-radius: 999px;
-  padding: 8px 18px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  z-index: 200;
-  max-width: min(80vw, 640px);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.se-toast.hidden { display: none; }
-.se-toast--ok { border-color: var(--tb-ok); color: var(--tb-ok); }
-.se-toast--err { border-color: var(--tb-danger); color: var(--tb-danger); }
 
 /* ---------- 小修正 ---------- */
 .tb-input--sm { padding: 3px 8px; font-size: var(--tb-fs-sm); }

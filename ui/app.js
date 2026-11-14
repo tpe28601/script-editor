@@ -67,7 +67,7 @@ var toastTimer = 0;
 function toast(msg, ok) {
   var t = $('toast');
   t.textContent = msg;
-  t.className = 'se-toast' + (ok === false ? ' se-toast--err' : ok ? ' se-toast--ok' : '');
+  t.className = 'tb-toast' + (ok === false ? ' tb-toast--danger' : ok ? ' tb-toast--ok' : '');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(function () { t.classList.add('hidden'); }, 4000);
 }
@@ -699,18 +699,28 @@ function doExport(gui) {
 }
 
 // ---------------------------------------------------------------- 開啟專案彈窗
+function projectPickerRow(title, details, actions) {
+  return '<li class="se-picker-row"><div class="se-picker-row__info">' +
+    '<strong>' + esc(title) + '</strong><span class="tb-small tb-muted">' + esc(details) + '</span></div>' +
+    '<div class="se-picker-row__actions">' + actions + '</div></li>';
+}
+function savedProjectRow(it, allowDelete) {
+  var details = it.tasks + ' 個任務' + (it.updated ? ' · ' + it.updated : '');
+  var actions = '<button class="tb-btn tb-btn--sm" type="button" data-open="' + esc(it.name) + '">開啟</button>';
+  if (allowDelete) actions += '<button class="tb-btn tb-btn--sm tb-btn--danger" type="button" data-del="' +
+    esc(it.name) + '" aria-label="刪除專案 ' + esc(it.name) + '">刪除</button>';
+  return projectPickerRow(it.name, details, actions);
+}
+function projectPickerList(rows, empty) {
+  return rows.length ? '<ul class="se-picker-list">' + rows.join('') + '</ul>' :
+    '<div class="tb-empty">' + esc(empty) + '</div>';
+}
 function openProjectModal() {
   $('open-title').textContent = '開啟專案';
   getJson('/api/projects').then(unwrap).then(function (list) {
-    var html;
-    if (!list.length) html = '<div class="tb-empty">尚無已儲存的專案</div>';
-    else html = '<table class="tb-table"><thead><tr><th>名稱</th><th>任務</th><th>更新</th><th></th></tr></thead><tbody>' +
-      list.map(function (it) {
-        return '<tr><td>' + esc(it.name) + '</td><td>' + it.tasks + '</td><td>' + esc(it.updated) + '</td>' +
-          '<td style="text-align:right"><button class="tb-btn tb-btn--sm" data-open="' + esc(it.name) + '">開啟</button> ' +
-          '<button class="tb-btn tb-btn--sm tb-btn--ghost" data-del="' + esc(it.name) + '">刪除</button></td></tr>';
-      }).join('') + '</tbody></table>';
-    $('open-list').innerHTML = html;
+    $('open-list').innerHTML = projectPickerList(list.map(function (it) {
+      return savedProjectRow(it, true);
+    }), '尚無已儲存的專案');
     $('open-mask').classList.remove('hidden');
     Array.prototype.forEach.call($('open-list').querySelectorAll('[data-open]'), function (btn) {
       btn.addEventListener('click', function () {
@@ -735,25 +745,24 @@ function openProjectModal() {
 }
 
 // ---------------------------------------------------------------- 載入範例彈窗
-// 兩區: 我的專案（資料資料夾, 含匯入區塊包帶進來的）與內建範例（examples/, 唯讀）
+// 內建範例（唯讀）優先顯示，下方保留已儲存或匯入的專案。
 function openSampleModal() {
   $('open-title').textContent = '載入範例';
   Promise.all([getJson('/api/projects').then(unwrap), getJson('/api/samples').then(unwrap)])
     .then(function (r) {
       var mine = r[0], samples = r[1];
-      var html = '<div class="se-subhead">我的專案（含匯入區塊包的專案）</div>' +
-        (mine.length ? '<table class="tb-table"><tbody>' + mine.map(function (it) {
-          return '<tr><td>' + esc(it.name) + '<br><span class="tb-small tb-muted">' + it.tasks + ' 個任務・' +
-            esc(it.updated) + '</span></td><td style="text-align:right"><button class="tb-btn tb-btn--sm" data-open="' +
-            esc(it.name) + '">開啟</button></td></tr>';
-        }).join('') + '</tbody></table>' : '<div class="tb-empty">尚無專案（儲存或匯入區塊包後會出現在這裡）</div>') +
-        '<div class="se-subhead">內建範例（唯讀，修改後另存新名稱）</div>' +
-        (samples.length ? '<table class="tb-table"><tbody>' + samples.map(function (it) {
-          return '<tr><td>' + esc(it.title || it.name) + '<br><span class="tb-small tb-muted">' + esc(it.name) +
-            '・' + it.tasks + ' 個任務</span></td><td style="text-align:right"><button class="tb-btn tb-btn--sm" data-sample="' +
-            esc(it.id) + '">載入</button></td></tr>';
-        }).join('') + '</tbody></table>' : '<div class="tb-empty">無內建範例</div>');
-      $('open-list').innerHTML = html;
+      var sampleRows = samples.map(function (it) {
+        var details = (it.title && it.title !== it.name ? it.name + ' · ' : '') + it.tasks + ' 個任務';
+        return projectPickerRow(it.title || it.name, details,
+          '<button class="tb-btn tb-btn--sm" type="button" data-sample="' + esc(it.id) + '">載入</button>');
+      });
+      var projectRows = mine.map(function (it) { return savedProjectRow(it, false); });
+      $('open-list').innerHTML =
+        '<section class="se-picker-section" aria-labelledby="picker-samples"><h3 id="picker-samples">內建範例</h3>' +
+        '<p class="tb-small tb-muted">唯讀，修改後請以新名稱儲存。</p>' +
+        projectPickerList(sampleRows, '無內建範例') + '</section>' +
+        '<section class="se-picker-section" aria-labelledby="picker-projects"><h3 id="picker-projects">我的專案</h3>' +
+        projectPickerList(projectRows, '尚無專案。儲存或匯入後會顯示在這裡。') + '</section>';
       $('open-mask').classList.remove('hidden');
       Array.prototype.forEach.call($('open-list').querySelectorAll('[data-open]'), function (btn) {
         btn.addEventListener('click', function () { openSavedProject(btn.dataset.open); });
@@ -1088,6 +1097,16 @@ function refreshBlocks() {
 function initThemeToggle() {
   var btn = $('theme-toggle');
   if (!btn || !window.TbTheme) return;
+  var labels = { light: '淺色', dark: '深色', system: '跟隨系統' };
+  var icons = { light: 'sun', dark: 'moon', system: 'monitor' };
+  function paint() {
+    var mode = TbTheme.get().mode;
+    if (window.TbIcons) btn.innerHTML = TbIcons.svg(icons[mode], { anim: 'wiggle' });
+    btn.title = '主題：' + labels[mode] + '（點一下切換）';
+    btn.setAttribute('aria-label', btn.title);
+  }
+  paint();
+  document.addEventListener('tb-theme-change', paint);
   btn.addEventListener('click', function () {
     var m = TbTheme.get().mode;
     TbTheme.set(m === 'light' ? 'dark' : m === 'dark' ? 'system' : 'light');

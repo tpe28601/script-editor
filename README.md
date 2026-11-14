@@ -1,6 +1,6 @@
 # Script Editor
 
-**Script Editor 0.2.1** 是一個用拖拉「積木」組出 Windows 工具腳本的編輯器。把常用指令做成區塊（Block），在瀏覽器裡拖進任務（Task），一鍵匯出成單一 `.bat`：選單版在命令列視窗裡用按鍵選項目，GUI 版是一個有按鈕、狀態卡片與彩色輸出的 WinForms 視窗。匯出的腳本只用 Windows 內建的 cmd 與 PowerShell，拷到測試機就能跑。
+**Script Editor 0.2.2** 是一個用拖拉「積木」組出 Windows 工具腳本的編輯器。把常用指令做成區塊（Block），在瀏覽器裡拖進任務（Task），一鍵匯出成單一 `.bat`：選單版在命令列視窗裡用按鍵選項目，GUI 版是一個有按鈕、狀態卡片與彩色輸出的 WinForms 視窗。匯出的腳本只用 Windows 內建的 cmd 與 PowerShell，拷到測試機就能跑。
 
 > 這是 [Dev-Toolbox](https://github.com/tpe28601/Dev-Toolbox) 的工具之一，可以從 Hub 啟動，也可以單獨使用。
 

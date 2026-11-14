@@ -10,5 +10,5 @@
   "cli": { "entry": "Launch-SE.ps1", "menu": false, "json": false },
   "requires": ["python"],
   "dataDir": "%LOCALAPPDATA%/DevToolbox/script-editor",
-  "uiKit": "3.2.0"
+  "uiKit": "3.4.0"
 }

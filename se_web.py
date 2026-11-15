@@ -47,7 +47,7 @@ import se_core                                        # noqa: E402
 import se_pack                                        # noqa: E402
 from standalone_update import handle_update           # noqa: E402
 
-VERSION = '0.2.3'
+VERSION = '0.2.4'
 TOOL_ID = 'script-editor'
 DEFAULT_PORT = 8785
 MAX_PORT_SCAN = 20
